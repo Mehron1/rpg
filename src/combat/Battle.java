@@ -89,12 +89,17 @@ public class Battle {
 
         if (roll == 20) {
             damage *= 2;
+            enemy.takeDamage(damage);
+
             System.out.println("🔥 КРИТ!");
+            System.out.println("💥 Урон: " + damage);
+
+            return;
         }
 
         if (roll >= enemy.armorClass) {
             enemy.takeDamage(damage);
-            System.out.println("💥 Удар! урон: " + damage +"\n Оставшееся HP у врага: " + enemy.hp);
+            System.out.println("💥 Ты нанёс " + damage + " урона!");
         } else {
             System.out.println("🛡️ Враг увернулся!");
         }

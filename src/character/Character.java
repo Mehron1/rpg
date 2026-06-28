@@ -1,12 +1,17 @@
 package character;
 
+import combat.StatusEffect;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class Character {
 
     public String name;
     public int hp;
     public int damage;
     public int armorClass;
-
+    public List<StatusEffect> effects = new ArrayList<>();
     public Character(
             String name,
             int hp,
