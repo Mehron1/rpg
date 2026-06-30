@@ -1,58 +1,23 @@
-import character.Enemy;
 import character.Player;
-import combat.Battle;
-
-import java.util.Scanner;
+import game.Game;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        Scanner scanner = new Scanner(System.in);
+        Player player = new Player(
+                "Смеагол",
+                30,     // hp
+                6,      // damage
+                12,     // armorClass
+                "Rogue",
+                30      // maxHp
+        );
 
-        System.out.print("Введите имя героя: ");
-        String name = scanner.nextLine();
-        System.out.println("\nВыберите класс:");
-        System.out.println("1 - Воин");
-        System.out.println("2 - Маг");
-        System.out.println("3 - Разбойник");
+        System.out.println("🎮 Добро пожаловать, дорогой друг. Сейчас ты познакомишься с судьбой того, чью душу загубила " +
+                " и опустошила его прелесть... Путешествие начинается!");
+        System.out.println("👤 Герой: " + player.name);
 
-        int choice = scanner.nextInt();
-        scanner.nextLine();
-        Player player;
-        if (choice == 1) {
-
-            player = new Player(
-                    name,
-                    120,
-                    25,
-                    14,
-                    "Воин"
-            );
-
-        }else if (choice == 2) {
-
-            player = new Player(
-                    name,
-                    80,
-                    30,
-                    10,
-                    "Маг"
-            );
-
-        }else {
-
-            player = new Player(
-                    name,
-                    90,
-                    22,
-                    12,
-                    "Разбойник"
-            );
-
-        }
-        Enemy goblin = new Enemy("Орк", 85, 15, 11);
-
-        Battle.fight(player, goblin, scanner);
+        Game.start(player);
     }
 }

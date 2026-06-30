@@ -8,10 +8,14 @@ public class GameState {
     public boolean questAccepted = false;
     public boolean questCompleted = false;
     public boolean oldManQuestFinished = false;
+    public boolean visitedForest = false;
+    public boolean ringFound = false;
+    public boolean deagolKilled = false;
     public String location = "Город";
     public enum Location {
         CITY,
         FOREST,
-        CAVE
+        CAVE,
+        RIVER
     }
 }

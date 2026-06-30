@@ -2,8 +2,6 @@ package combat;
 
 import character.Player;
 import character.Enemy;
-import combat.StatusEffect;
-import combat.Dice;
 import character.Character;
 import java.util.Iterator;
 import java.util.Scanner;
@@ -83,16 +81,7 @@ public class CombatEngine {
         switch (choice) {
 
             case 1 -> {
-                int roll = Dice.rollD20();
-
-                System.out.println("🎲 Атака: " + roll);
-
-                if (roll >= enemy.armorClass) {
-                    enemy.hp -= player.damage;
-                    System.out.println("💥 Урон: " + player.damage);
-                } else {
-                    System.out.println("💨 Промах!");
-                }
+                DamageCalculator.attack(player, enemy);
             }
 
             case 2 -> {
@@ -123,21 +112,11 @@ public class CombatEngine {
         if (enemy.hp < enemy.maxHp * 0.3) {
 
             System.out.println("👹 Враг паникует и защищается!");
-            enemy.effects.add(new StatusEffect("GUARD", 1, 2));
+            enemy.effects.add(new StatusEffect("GUARD", 2, 2));
             return;
         }
 
-        int roll = Dice.rollD20();
-
-        if (roll >= player.armorClass) {
-
-            int dmg = enemy.damage;
-            player.hp -= dmg;
-
-            System.out.println("💀 Враг наносит " + dmg);
-        } else {
-            System.out.println("🛡️ Ты уклонился!");
-        }
+        DamageCalculator.attack(enemy, player);
     }
 
 }

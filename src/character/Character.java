@@ -29,4 +29,12 @@ public class Character {
     public boolean isAlive() {
         return hp > 0;
     }
+    public boolean hasEffect(String name) {
+        for (StatusEffect e : effects) {
+            if (e.name.equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
