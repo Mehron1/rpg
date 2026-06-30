@@ -11,6 +11,7 @@ public class CombatEngine {
     public static void fight(Player player, Enemy enemy, Scanner scanner) {
 
         int round = 1;
+        boolean ringPowerUsed = false;
 
         while (player.hp > 0 && enemy.hp > 0) {
 
@@ -27,13 +28,22 @@ public class CombatEngine {
                 break;
             }
 
-            playerTurn(player, enemy, scanner);
+            if (hasRing(player) && !ringPowerUsed && player.hp <= 20) {
+                activateRingPower(player);
+                ringPowerUsed = true;
+            }
+
+            if (playerTurn(player, enemy, scanner, ringPowerUsed)) {
+                ringPowerUsed = true;
+            }
 
             if (enemy.hp <= 0) {
                 break;
             }
 
-            enemyTurn(player, enemy);
+            if (enemyTurn(player, enemy, ringPowerUsed)) {
+                ringPowerUsed = true;
+            }
 
             round++;
         }
@@ -69,12 +79,15 @@ public class CombatEngine {
             }
         }
     }
-    static void playerTurn(Player player, Enemy enemy, Scanner scanner) {
+    static boolean playerTurn(Player player, Enemy enemy, Scanner scanner, boolean ringPowerUsed) {
 
         System.out.println("\n🎮 ТВОЙ ХОД");
         System.out.println("1 - Атака");
         System.out.println("2 - Защита");
-        System.out.println("3 - Использовать способность");
+
+        if (hasRing(player)) {
+            System.out.println("3 - Надеть Кольцооо...");
+        }
 
         int choice = scanner.nextInt();
 
@@ -89,34 +102,88 @@ public class CombatEngine {
                 System.out.println("🛡️ Защита активирована");
             }
 
-            case 3 -> useSkill(player, enemy);
+            case 3 -> {
+                if (!hasRing(player)) {
+                    System.out.println("У Смеагола ещё нет Кольца.");
+                } else if (ringPowerUsed) {
+                    System.out.println("💍 Кольцо уже помогло в этом бою.");
+                } else {
+                    return useSkill(player);
+                }
+            }
             default -> System.out.println("Неверное действие.");
         }
+
+        return false;
     }
-    static void useSkill(Player player, Enemy enemy) {
+    static boolean useSkill(Player player) {
 
-        int roll = Dice.rollD20();
+        return activateRingPower(player);
+    }
+    static boolean enemyTurn(Player player, Enemy enemy, boolean ringPowerUsed) {
 
-        System.out.println("🎲 Скилл бросок: " + roll);
-
-        if (roll >= 12) {
-
-            enemy.effects.add(new StatusEffect("POISON", 3, 5));
-            System.out.println("☠️ Ты наложил яд!");
-        } else {
-            System.out.println("💨 Скилл провален");
+        if (player.hasEffect("INVISIBLE")) {
+            System.out.println("💍 Смеагол невидим. Враг не может на него напасть.");
+            return false;
         }
-    }
-    static void enemyTurn(Player player, Enemy enemy) {
 
         if (enemy.hp < enemy.maxHp * 0.3) {
 
             System.out.println("👹 Враг паникует и защищается!");
             enemy.effects.add(new StatusEffect("GUARD", 2, 2));
-            return;
+            return false;
         }
 
-        DamageCalculator.attack(enemy, player);
+        int roll = Dice.rollD20();
+        int damage = enemy.damage;
+
+        System.out.println(enemy.name + " бросает кубик: " + roll);
+
+        if (roll == 1) {
+            System.out.println("💨 ПРОМАХ!");
+            return false;
+        }
+
+        if (roll == 20) {
+            damage *= 2;
+            System.out.println("🔥 КРИТ!");
+        }
+
+        if (player.hasEffect("GUARD")) {
+            System.out.println("🛡️ " + player.name + " под защитой!");
+            damage -= 3;
+
+            if (damage < 0) damage = 0;
+        }
+
+        if (roll < player.armorClass) {
+            System.out.println("🛡️ " + player.name + " увернулся!");
+            return false;
+        }
+
+        if (hasRing(player) && !ringPowerUsed && player.hp - damage <= 0) {
+            System.out.println("💍 Удар должен был стать смертельным, но Кольцо скрывает Смеагола.");
+            return activateRingPower(player);
+        }
+
+        player.takeDamage(damage);
+        System.out.println("💥 " + enemy.name + " наносит " + damage + " урона!");
+        return false;
+    }
+    static boolean activateRingPower(Player player) {
+
+        if (player.hasEffect("INVISIBLE")) {
+            System.out.println("💍 Смеагол уже невидим.");
+            return false;
+        }
+
+        player.effects.add(new StatusEffect("INVISIBLE", 4, 3));
+        System.out.println("💍 Кольцо скрывает Смеагола на 4 хода.");
+        System.out.println("Враги не могут атаковать его, а к броскам Смеагола прибавляется +3.");
+        return true;
+    }
+    static boolean hasRing(Player player) {
+        return player.hasItem("Кольцо");
     }
 
 }

@@ -19,4 +19,13 @@ public class Player extends Character {
         this.playerClass = playerClass;
         this.maxHp = maxHp;
     }
+    public boolean hasItem(String itemName) {
+        for (Item item : inventory) {
+            if (item.name.equals(itemName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

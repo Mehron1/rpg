@@ -263,7 +263,7 @@ public class Game {
         state.corruption += corruption;
 
         System.out.println("Смеагол прижимает кольцо к себе. \"Моя прелесть...\"");
-        System.out.println("Урон +2, защита +1, коррупция +" + corruption + ".");
+        System.out.println("Урон +2, защита +1, влияние кольца +" + corruption + ".");
     }
     static boolean canEnterCave(GameState state) {
         return state.visitedForest && state.ringFound && state.deagolKilled;

@@ -6,9 +6,20 @@ public class DamageCalculator {
     static void attack(Character attacker, Character defender) {
 
         int roll = Dice.rollD20();
+        int attackRoll = roll;
         int damage = attacker.damage;
 
-        System.out.println(attacker.name + " бросает кубик: " + roll);
+        if (attacker.hasEffect("INVISIBLE")) {
+            attackRoll += 3;
+            System.out.println(attacker.name + " бросает кубик: " + roll + " + 3 за невидимость = " + attackRoll);
+        } else {
+            System.out.println(attacker.name + " бросает кубик: " + roll);
+        }
+
+        if (defender.hasEffect("INVISIBLE")) {
+            System.out.println("💍 " + defender.name + " невидим. Атака проходит мимо.");
+            return;
+        }
 
         if (roll == 1) {
             System.out.println("💨 ПРОМАХ!");
@@ -27,7 +38,7 @@ public class DamageCalculator {
             if (damage < 0) damage = 0;
         }
 
-        if (roll >= defender.armorClass) {
+        if (attackRoll >= defender.armorClass) {
             defender.takeDamage(damage);
             System.out.println("💥 " + attacker.name + " наносит " + damage + " урона!");
         } else {
