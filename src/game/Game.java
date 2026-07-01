@@ -1,11 +1,11 @@
 package game;
-import character.Enemy;
-import character.Goblin;
 import character.Orc;
 import character.Player;
 import combat.CombatEngine;
 import combat.Dice;
 import inventory.Item;
+import world.Forest;
+import world.Village;
 
 import java.util.Scanner;
 public class Game {
@@ -36,8 +36,8 @@ public class Game {
 
             switch (choice) {
 
-                case 1 -> enterForest(player, state, scanner);
-                case 2 -> enterCity(player, state, scanner);
+                case 1 -> Forest.enter(player, state, scanner);
+                case 2 -> Village.enter(player, state, scanner);
                 case 3 -> enterCave(player, state, scanner);
                 case 4 -> enterRiver(player, state, scanner);
                 case 5 -> rest(player);
@@ -47,120 +47,6 @@ public class Game {
                     return;
                 }
                 default -> System.out.println("Выбери действие из списка.");
-            }
-        }
-    }
-    static void enterForest(Player player, GameState state, Scanner scanner) {
-
-        state.location = "Лес";
-        state.visitedForest = true;
-
-        System.out.println("\n🌲 Ты вошёл в лес...");
-        if (state.questAccepted && !state.questCompleted) {
-
-            int chance = Dice.rollD20();
-
-            if (chance >= 15) {
-
-                System.out.println("✨ Под деревом ты заметил медальон!");
-
-                player.inventory.add(
-                        new Item(
-                                "Медальон старика",
-                                "Старый серебряный медальон"
-                        )
-                );
-                state.questCompleted = true;
-
-                return;
-            }
-        }
-        int event = Dice.rollD20();
-
-        if (event < 12) {
-            System.out.println("🧟 На тебя напал Гоблин!");
-            CombatEngine.fight(player, new Goblin(), scanner);
-        }
-
-        else if (event < 18) {
-            System.out.println("💰 Ты нашёл золото!");
-            state.gold += 10;
-        }
-
-        else {
-            System.out.println("🌿 Спокойный лес. Ты отдыхаешь.");
-            player.hp = Math.min(
-                    player.maxHp,
-                    player.hp + 5
-            );
-        }
-    }
-    static void enterCity(Player player, GameState state, Scanner scanner) {
-
-        state.location = "Деревня";
-
-        System.out.println("\n🏰 Ты в деревне.");
-
-        if (state.ringFound) {
-            state.corruption += 5;
-            System.out.println("🌑 Кольцо тяжелеет в кармане. Его влияние растёт: +5.");
-        }
-
-        if (state.questCompleted) {
-
-            System.out.println("\n👴 Старик увидел медальон!");
-
-            System.out.println("\"Ты нашёл его! Спасибо!\"");
-
-            state.gold += 50;
-
-            System.out.println("💰 Получено золото: 50");
-            Item foundItem = null;
-
-            for (Item item : player.inventory) {
-
-                if (item.name.equals("Медальон старика")) {
-                    foundItem = item;
-                    break;
-                }
-            }
-
-            if (foundItem != null) {
-                player.inventory.remove(foundItem);
-            }
-            state.questCompleted = false;
-            state.questAccepted = false;
-            state.oldManQuestFinished = true;
-            return;
-        }
-        if (!state.oldManQuestFinished
-                && !state.questAccepted
-                && !state.questCompleted) {
-
-            System.out.println("\n👴 Старик обращается к тебе.");
-            System.out.println("\"В лесу пропал мой медальон.\"");
-            System.out.println("\"Поможешь найти его?\"");
-
-            System.out.println("1 - Да");
-            System.out.println("2 - Нет");
-
-            int choice = scanner.nextInt();
-
-            if (choice == 1) {
-                if (state.ringFound) {
-                    state.corruption += 7;
-                    System.out.println("Смеагол щурится и шипит на старика:");
-                    System.out.println("\"Сам ищи свой медальон. У нас есть дела важнее!\"");
-                    System.out.println("Квест не взят. Влияние кольца +7.");
-                    System.out.println("Смеагол резко разворачивается и уходит в лес.");
-                    enterForest(player, state, scanner);
-                    return;
-                }
-
-                state.questAccepted = true;
-                System.out.println("📜 Квест получен!");
-            } else {
-                System.out.println("👴 Старик выглядит расстроенным.");
             }
         }
     }
